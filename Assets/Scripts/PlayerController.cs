@@ -10,12 +10,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int score;
     [SerializeField] private bool isDelay = false;
     [SerializeField] private bool isPlayerAlive;
+
+    public delegate void ChangeBarrierPosition(Vector2 pos);
+    public static event ChangeBarrierPosition OnVelocityChanged;
+
     void Start()
     {
         playerRB = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(Input.GetMouseButtonDown(0) && !isDelay)
@@ -29,8 +32,19 @@ public class PlayerController : MonoBehaviour
         {
             score = (int)transform.position.y + 1;
             GameManager.Instance.UpdateScore(score);
-            Debug.Log(score);
         }
+        
+        if(playerRB.velocity.y > 0)
+        {
+            if (OnVelocityChanged != null)
+                OnVelocityChanged(transform.position);
+        }
+
+        if(!isPlayerAlive)
+        {
+            GameManager.Instance.UpdateHighScore(score);
+        }
+
     }
 
     private IEnumerator InputDelayRoutine()
@@ -56,9 +70,10 @@ public class PlayerController : MonoBehaviour
             Destroy(collision.gameObject);
             GameManager.Instance.AddCoins();
         }
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("BottomBarrier"))
         {
             Time.timeScale = 0;
+            isPlayerAlive = false;
         }
     }
 }
