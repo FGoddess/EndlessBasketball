@@ -4,54 +4,72 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private Rigidbody2D playerRB;
-    [SerializeField] private float jumpForce;
-    [SerializeField] private float jumpDirection;
-    [SerializeField] private int score;
-    [SerializeField] private bool isDelay = false;
-    [SerializeField] private bool isPlayerAlive;
+    private Rigidbody2D _playerRB;
+    [SerializeField] private float _jumpForce;
+    [SerializeField] private float _jumpDirection;
+    [SerializeField] private int _score;
+    [SerializeField] private bool _isDelay = false;
+    [SerializeField] private bool _isPlayerAlive;
 
     public delegate void ChangeBarrierPosition(Vector2 pos);
     public static event ChangeBarrierPosition OnVelocityChanged;
 
     void Start()
     {
-        playerRB = GetComponent<Rigidbody2D>();
+        _playerRB = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
-        if(Input.GetMouseButtonDown(0) && !isDelay)
+        PlayerControl();
+        ScoreChange();
+        BarrierPositionChange();
+
+        if (!_isPlayerAlive)
         {
-            playerRB.velocity = new Vector2(0,0);
-            playerRB.AddForce(new Vector2(jumpDirection, jumpForce), ForceMode2D.Impulse);
-            StartCoroutine("InputDelayRoutine");
+            GameManager.Instance.UpdateHighScore(_score);
         }
 
-        if(transform.position.y > 0 && score < transform.position.y)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            score = (int)transform.position.y + 1;
-            GameManager.Instance.UpdateScore(score);
-        }
-        
-        if(playerRB.velocity.y > 0)
-        {
-            if (OnVelocityChanged != null)
-                OnVelocityChanged(transform.position);
-        }
-
-        if(!isPlayerAlive)
-        {
-            GameManager.Instance.UpdateHighScore(score);
+            _playerRB.simulated = false;
         }
 
     }
 
+    private void BarrierPositionChange()
+    {
+        if (_playerRB.velocity.y > 0)
+        {
+            if (OnVelocityChanged != null)
+                OnVelocityChanged(transform.position);
+        }
+    }
+
+    private void ScoreChange()
+    {
+        if (transform.position.y > 0 && _score < transform.position.y)
+        {
+            _score = (int)transform.position.y + 1;
+            GameManager.Instance.UpdateScore(_score);
+        }
+    }
+
+    private void PlayerControl()
+    {
+        if (Input.GetMouseButtonDown(0) && !_isDelay)
+        {
+            _playerRB.velocity = new Vector2(0, 0);
+            _playerRB.AddForce(new Vector2(_jumpDirection, _jumpForce), ForceMode2D.Impulse);
+            StartCoroutine("InputDelayRoutine");
+        }
+    }
+
     private IEnumerator InputDelayRoutine()
     {
-        isDelay = true;
+        _isDelay = true;
         yield return new WaitForSeconds(.3f);
-        isDelay = false;
+        _isDelay = false;
     }
 
 
@@ -59,7 +77,7 @@ public class PlayerController : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("Wall"))
         {
-            jumpDirection *= -1;
+            _jumpDirection *= -1;
         }
     }
 
@@ -72,8 +90,8 @@ public class PlayerController : MonoBehaviour
         }
         if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("BottomBarrier"))
         {
-            Time.timeScale = 0;
-            isPlayerAlive = false;
+            //Time.timeScale = 0;
+            //_isPlayerAlive = false;
         }
     }
 }

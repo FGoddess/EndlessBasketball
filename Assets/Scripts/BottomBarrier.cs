@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BottomBarrier : MonoBehaviour
 {
-    [SerializeField] private float barrierOffset;
+    [SerializeField] private float _barrierOffset;
 
     private void OnEnable()
     {
@@ -18,7 +18,7 @@ public class BottomBarrier : MonoBehaviour
 
     private void ChangePosition(Vector2 playerPos)
     {
-        if(transform.position.y < playerPos.y + barrierOffset)
-            transform.position = new Vector3(transform.position.x, playerPos.y + barrierOffset, transform.position.z);
+        if(transform.position.y < playerPos.y + _barrierOffset)
+            transform.position = new Vector3(transform.position.x, playerPos.y + _barrierOffset, transform.position.z);
     }
 }

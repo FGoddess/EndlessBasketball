@@ -20,29 +20,29 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         _instance = this;
-        coinsAmount = PlayerPrefs.GetInt("Coins", coinsAmount);
-        highScore = PlayerPrefs.GetInt("HighScore", highScore);
-        highScoreText.text = $"HighScore: {highScore}";
-        coinsText.text = $"Coins: {coinsAmount}";
+        _coinsAmount = PlayerPrefs.GetInt("Coins", _coinsAmount);
+        _highScore = PlayerPrefs.GetInt("HighScore", _highScore);
+        _highScoreText.text = $"HighScore: {_highScore}";
+        _coinsText.text = $"Coins: {_coinsAmount}";
     }
 
-    [SerializeField] private int coinsAmount;
-    [SerializeField] private int highScore;
-    [SerializeField] private TextMeshProUGUI coinsText;
-    [SerializeField] private TextMeshProUGUI scoreText;
-    [SerializeField] private TextMeshProUGUI highScoreText;
+    [SerializeField] private int _coinsAmount;
+    [SerializeField] private int _highScore;
+    [SerializeField] private TextMeshProUGUI _coinsText;
+    [SerializeField] private TextMeshProUGUI _scoreText;
+    [SerializeField] private TextMeshProUGUI _highScoreText;
 
     public void AddCoins()
     {
-        coinsText.text = $"Coins: {++coinsAmount}";
-        PlayerPrefs.SetInt("Coins", coinsAmount);
+        _coinsText.text = $"Coins: {++_coinsAmount}";
+        PlayerPrefs.SetInt("Coins", _coinsAmount);
     }
 
     public void UpdateScore(int score)
     {
-        scoreText.text = $"Score: {score}";
-        if(score > highScore)
-            highScoreText.text = $"HighScore: {score}";
+        _scoreText.text = $"Score: {score}";
+        if(score > _highScore)
+            _highScoreText.text = $"HighScore: {score}";
     }
 
     public void UpdateHighScore(int hs)
