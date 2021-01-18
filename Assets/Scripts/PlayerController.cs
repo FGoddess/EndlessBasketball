@@ -8,7 +8,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _jumpForce;
     [SerializeField] private float _jumpDirection;
     [SerializeField] private int _score;
-    [SerializeField] private bool _isDelay = false;
+    [SerializeField] private bool _isInputDelay = false;
+    [SerializeField] private bool _isColliderDelay = false;
     [SerializeField] private bool _isPlayerAlive;
 
     public delegate void ChangeBarrierPosition(Vector2 pos);
@@ -57,7 +58,7 @@ public class PlayerController : MonoBehaviour
 
     private void PlayerControl()
     {
-        if (Input.GetMouseButtonDown(0) && !_isDelay)
+        if (Input.GetMouseButtonDown(0) && !_isInputDelay)
         {
             _playerRB.velocity = new Vector2(0, 0);
             _playerRB.AddForce(new Vector2(_jumpDirection, _jumpForce), ForceMode2D.Impulse);
@@ -67,17 +68,24 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator InputDelayRoutine()
     {
-        _isDelay = true;
+        _isInputDelay = true;
         yield return new WaitForSeconds(.3f);
-        _isDelay = false;
+        _isInputDelay = false;
+    }
+    private IEnumerator ColliderDelay()
+    {
+        _isColliderDelay = true;
+        yield return new WaitForSeconds(.1f);
+        _isColliderDelay = false;
     }
 
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.CompareTag("Wall"))
+        if(collision.gameObject.CompareTag("Wall") && !_isColliderDelay)
         {
             _jumpDirection *= -1;
+            StartCoroutine("ColliderDelay");
         }
     }
 
@@ -90,8 +98,8 @@ public class PlayerController : MonoBehaviour
         }
         if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("BottomBarrier"))
         {
-            //Time.timeScale = 0;
-            //_isPlayerAlive = false;
+            Time.timeScale = 0;
+            _isPlayerAlive = false;
         }
     }
 }
